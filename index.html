@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roberts Family Horse · Strategy Table</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="shortcut icon" href="favicon.ico">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+  :root{--felt:#07543d;--felt2:#063d30;--ink:#f4f5e9;--gold:#f7d580;--muted:#cad9cf;--line:#ffffff35;--white:#fffdfa;--dark:#14241f;--red:#bb2038}
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;background:#e8ece8;color:var(--dark)}
+  .page{max-width:1180px;margin:auto;padding:22px 16px 40px}
+  header{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap}
+  h1{font:700 clamp(24px,3.8vw,34px) Georgia,serif;margin:0;color:#153f32}
+  .eyebrow{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;font-weight:800;color:#487260;margin:0 0 7px}
+  .sub{margin:8px 0 0;color:#53665d;line-height:1.5}
+  button{font:inherit;cursor:pointer}
+  button:focus-visible{outline:3px solid #e3b84c;outline-offset:3px}
+  .btn{border:0;border-radius:12px;padding:12px 19px;font-weight:750;background:#f4d47a;color:#193a2e;box-shadow:0 2px 4px #0001}
+  .btn:hover{filter:brightness(1.04)}
+  .btn.secondary{background:white;color:#225645;border:1px solid #b3c8bc}
+  .btn:disabled{opacity:.45;cursor:default;filter:none}
+  .controls{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
+  .felt{margin-top:21px;background:radial-gradient(ellipse at center,#11694b 0%,var(--felt) 65%,var(--felt2) 100%);border:7px solid #9e693b;border-radius:28px;box-shadow:0 12px 26px #123e2b29,inset 0 0 0 2px #ecdd9a4f;color:var(--ink);padding:21px 16px 18px}
+  .scorebar{display:flex;justify-content:center;flex-wrap:wrap;gap:12px;align-items:stretch}
+  .score{background:#ffffff14;border:1px solid #ffffff35;border-radius:14px;text-align:center;padding:11px 20px;min-width:155px}
+  .score .title{font-size:13px;color:#d0dfd5}.score strong{font-size:29px;font-weight:800;display:block;line-height:1.2}
+  .score.bid strong{font-size:24px;color:var(--gold)}
+  .table-grid{display:grid;grid-template-columns:minmax(120px,1fr) minmax(185px,2.2fr) minmax(120px,1fr);grid-template-rows:auto minmax(220px,auto) auto;gap:12px;align-items:center;justify-items:center;margin:22px auto 10px;max-width:870px}
+  .seat{border-radius:14px;background:#002e255b;border:1px solid var(--line);padding:15px 9px;text-align:center;width:100%;max-width:245px;min-height:92px}
+  .seat .loc{font-size:12px;color:#b8d5c9;text-transform:uppercase;letter-spacing:1px}
+  .seat strong{font-size:16px;display:block;margin:3px 0}.seat .little{font-size:12px;color:#e7eee8}
+  .seat.active{border:2px solid #f2d481;box-shadow:0 0 0 4px #f2d48118}
+  .seat.north{grid-column:2;grid-row:1}.seat.west{grid-column:1;grid-row:2}.seat.east{grid-column:3;grid-row:2}.seat.south{grid-column:2;grid-row:3;background:#00291f88}
+  .center{grid-column:2;grid-row:2;text-align:center;border-radius:100px;background:#083f3369;border:1px dashed #ffffff3d;align-self:stretch;justify-self:stretch;display:flex;flex-direction:column;justify-content:center;padding:17px 12px;min-height:234px}
+  .turn-head{font-weight:800;font-size:17px;color:#f7dc92}
+  .center .hint{color:#c8dbd0;font-size:13px;margin:5px 0 9px}
+  .plays{display:flex;justify-content:center;gap:7px;flex-wrap:wrap}
+  .play{text-align:center}.play .who{font-size:11px;color:#d4e1d5;margin:5px 0 1px}
+  .play .winning{font-size:12px;font-weight:700;color:#ffe6a7}
+  .card{background:var(--white);color:#101a18;border:1px solid #c7cbc6;box-shadow:0 2px 4px #0002;border-radius:8px;width:55px;height:78px;display:flex;align-items:center;justify-content:center;flex-direction:column;font-family:Georgia,serif;line-height:1.05;font-size:26px;font-weight:700;user-select:none;position:relative}
+  .card.red{color:var(--red)}.card small{font-size:22px}
+  .card.current{outline:3px solid #ffe2a2}
+  .card.mini{width:43px;height:60px;font-size:20px;border-radius:6px}.card.mini small{font-size:18px}
+  .card.back{background:repeating-linear-gradient(45deg,#194c9b,#194c9b 6px,#2864b7 6px,#2864b7 12px);border:3px solid white;color:white}
+  .hand{padding:17px 12px 12px;background:#073c305e;border:1px solid var(--line);border-radius:16px;max-width:780px;margin:17px auto 0;text-align:center}
+  .hand h2{font-size:15px;font-weight:750;margin:0 0 5px}.hand p{margin:0 0 11px;font-size:13px;color:#d6e5da}
+  .handcards{display:flex;justify-content:center;gap:clamp(4px,1vw,9px);flex-wrap:wrap;min-height:82px}
+  .handcards .card{width:clamp(46px,11vw,63px);height:clamp(70px,15vw,88px);font-size:28px;transition:transform .12s ease}
+  .handcards .card small{font-size:24px}.handcards button.card{padding:0}
+  /* Small visual break between printed suits in displayed hands. */
+  .handcards .card.suit-start{margin-left:clamp(5px,1.2vw,12px)}
+  .review-row .cards .card.suit-start{margin-left:9px}
+  .handcards button.card.legal{outline:3px solid #f6db8b;outline-offset:2px;transform:translateY(-3px)}
+  .handcards button.card.legal:hover{transform:translateY(-8px)}
+  .handcards button.card.illegal{opacity:.46;cursor:not-allowed}
+  .handcards .empty{font-size:14px;color:#dfefe2;margin:30px auto}
+  .lower{display:grid;grid-template-columns:1.25fr 1fr;gap:18px;margin-top:21px}
+  .panel{background:white;border:1px solid #dce4dc;border-radius:16px;padding:19px;box-shadow:0 3px 9px #163d2510}
+  .panel h2{font:700 20px Georgia,serif;color:#194f3a;margin:0 0 11px}
+  .callout{padding:12px 14px;border-left:4px solid #bd8c35;background:#fff8e8;border-radius:7px;line-height:1.5;margin:11px 0 0}
+  .status{font-size:15px;line-height:1.6;margin:0}
+  .status strong{color:#174e3a}
+  table{border-collapse:collapse;width:100%;font-size:13px}
+  th,td{padding:9px 7px;border-bottom:1px solid #e1e8e0;text-align:left;white-space:nowrap}
+  th{color:#4d655a;font-size:12px} td .redtext{color:var(--red)}
+  .table-scroll{overflow-x:auto}
+  .pill{display:inline-block;background:#e1efe6;color:#235b42;padding:3px 7px;font-size:11px;font-weight:700;border-radius:50px}
+  .note{margin-top:15px;color:#52665c;font-size:13px;line-height:1.5}
+  .review{display:none;margin-top:15px;padding-top:15px;border-top:1px solid #dce4dc}
+  .review.show{display:block}
+  .review h3{margin:0 0 9px;font-size:16px}
+  .review-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:7px 0;border-bottom:1px solid #edf0ed}
+  .review-row>span{width:110px;font-weight:750;font-size:13px}
+  .review-row .cards{display:flex;gap:4px;flex-wrap:wrap}
+  .top-actions{display:flex;flex-wrap:wrap;gap:9px;align-items:center}
+  .phase-panel{margin-top:18px;padding:20px;background:white;border:1px solid #d5e2d7;border-radius:18px}
+  .phase-panel[hidden]{display:none}
+  .phase-panel h2{font:700 23px Georgia,serif;color:#184b37;margin:0 0 8px}
+  .phase-description{color:#4d6457;margin:0 0 14px;line-height:1.55}
+  .bid-row{display:flex;flex-wrap:wrap;align-items:end;gap:12px;margin:14px 0}
+  .bid-field{display:flex;flex-direction:column;gap:5px;min-width:165px;flex:1}
+  .bid-field label{font-weight:700;color:#294c3c;font-size:13px}
+  .bid-field select{font:inherit;min-height:46px;border:1px solid #aabdb1;border-radius:10px;padding:9px;background:#fff;color:#1d382b;width:100%}
+  .bid-feed{margin:12px 0 0;padding:0;list-style:none;display:flex;gap:7px;flex-wrap:wrap}
+  .bid-feed li{background:#e8eee9;border-radius:9px;padding:8px 10px;font-size:13px;font-weight:650;color:#255140}
+  .bid-feed li.high{background:#fdf1c7;color:#553e0e}
+  .bid-info{background:#f2f7f4;border-left:4px solid #40805e;border-radius:8px;padding:11px 13px;margin-top:11px;line-height:1.55}
+  .bid-note{font-size:13px;color:#55685c;line-height:1.5;margin:9px 0 0}
+  .btn.small{padding:9px 12px}
+  .strategy-panel{margin-top:20px;border-color:#bbd1c3}
+  .strategy-panel[hidden]{display:none}
+  .strategy-intro{color:#4a6254;line-height:1.55;margin:0 0 13px}
+  .strategy-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .analysis-box{border-radius:12px;background:#f2f7f3;padding:15px;border:1px solid #d9e9df}
+  .analysis-box h3{font-size:17px;color:#1b523b;margin:0 0 8px}
+  .analysis-box p{line-height:1.58;margin:0 0 8px}
+  .analysis-box p:last-child{margin:0}
+  .strategy-tag{font-weight:750;background:#e2ebdd;border-radius:6px;padding:3px 7px;display:inline-block;margin-bottom:8px}
+  .moments{padding-left:20px;line-height:1.55;margin:0}
+  .moments li{margin-bottom:10px}
+  .analysis-note{font-size:13px;color:#52685a;line-height:1.5}
+  .what-if{border-top:1px solid #dce8de;margin-top:20px;padding-top:17px}
+  .review-fields{display:flex;gap:12px;flex-wrap:wrap;margin:12px 0}
+  .review-fields label{font-size:13px;font-weight:700;color:#365742;display:flex;flex-direction:column;gap:5px;flex:1;min-width:175px}
+  .review-fields select{background:white;color:#21392c;border:1px solid #9bb6a5;border-radius:9px;font:inherit;padding:10px;min-height:45px;width:100%}
+  .review-fields select:disabled{opacity:.55}
+  .alt-result{border-left:4px solid #4a8461;background:#f3f8f2;padding:12px 14px;border-radius:8px;line-height:1.55}
+  .strategy-subhead{margin:0 0 9px;font:700 20px Georgia,serif;color:#194f3a}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  @media(max-width:800px){.strategy-grid{grid-template-columns:1fr}.top-actions{width:100%}.top-actions .btn{flex:1 1 130px}.bid-field{min-width:130px}.lower{grid-template-columns:1fr}.page{padding:16px 11px 25px}.felt{padding:15px 9px;border-width:5px}.table-grid{grid-template-columns:minmax(80px,1fr) minmax(140px,1.6fr) minmax(80px,1fr);gap:7px;margin-top:15px}.seat{padding:12px 4px}.seat strong{font-size:13px}.seat .little{font-size:11px}.card.mini{width:34px;height:49px;font-size:17px}.card.mini small{font-size:16px}.center{padding:13px 5px}.turn-head{font-size:14px}.play .who{font-size:10px}.score{min-width:110px;padding:9px}.score strong{font-size:23px}}
+  /* Compact phones: keep the table and horizontally scrollable trick history inside the viewport. */
+  @media(max-width:380px){
+    .table-grid{grid-template-columns:minmax(62px,1fr) minmax(118px,1.65fr) minmax(62px,1fr);gap:5px}
+    .lower{grid-template-columns:minmax(0,1fr)}
+    .lower>.panel{min-width:0}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <div>
+      <div class="eyebrow">The Roberts Family Deck · Training edition</div>
+      <h1>Horse Strategy Table</h1>
+      <p class="sub" id="deal-summary">Original practice deal · Your bid is 4 Spades. Play it, replay it, or start a fresh deal with a bidding round.</p>
+    </div>
+    <div class="top-actions">
+      <button class="btn secondary" id="restart" type="button" title="Play the current deal again with the same contract">↻ Replay hand</button>
+      <button class="btn secondary" id="rebid" type="button" title="Start bidding again with exactly these cards">Rebid this deal</button>
+      <button class="btn" id="new-deal" type="button" title="Shuffle all 24 cards and begin a fresh bidding round">New deal + bidding →</button>
+    </div>
+  </header>
+  <section id="bidding-phase" class="phase-panel" hidden aria-label="Bidding round">
+    <h2 id="bidding-title">Bidding round</h2>
+    <p id="bidding-status" class="phase-description" aria-live="polite"></p>
+    <div id="bid-entry" hidden>
+      <div class="bid-row">
+        <div class="bid-field"><label for="bid-level">Your bid</label><select id="bid-level"><option value="">— Choose a bid —</option><option value="pass">Pass</option><option value="3">3 tricks</option><option value="4">4 tricks</option><option value="5">5 tricks</option><option value="6">6 tricks</option><option value="7">Horse (all six)</option></select></div>
+        <button class="btn" id="submit-bid" type="button" disabled>Submit my bid</button>
+      </div>
+      <p id="bid-feedback" class="bid-note">Bid a number of tricks only. If you win the bidding, you will then choose trump.</p>
+    </div>
+    <div class="controls" id="bot-bid-controls">
+      <button class="btn" id="next-bid" type="button">Next bid →</button>
+    </div>
+    <div id="trump-choice" hidden>
+      <div class="bid-info"><strong>You won the bidding!</strong> Only the winning bidder now names trump (or No Trump).</div>
+      <div class="bid-row">
+        <div class="bid-field"><label for="bid-trump">Name your trump</label><select id="bid-trump"><option value="">— Choose after winning —</option><option value="S">♠ Spades</option><option value="H">♥ Hearts</option><option value="C">♣ Clubs</option><option value="D">♦ Diamonds</option><option value="NT">No trump</option></select></div>
+        <button class="btn" id="confirm-trump" type="button" disabled>Confirm trump →</button>
+      </div>
+    </div>
+    <div class="controls" id="bidding-complete" hidden>
+      <button class="btn" id="begin-play" type="button">Begin six-trick hand →</button>
+      <button class="btn secondary" id="redeal-pass" type="button" hidden>All passed — redeal</button>
+    </div>
+    <div class="bid-info" id="bid-info">Bid only the number of tricks (3–6 or Horse). The winning bidder names trump <strong>after</strong> the bidding ends. If everyone passes, the same dealer redeals.</div>
+    <ol class="bid-feed" id="bid-history" aria-label="Bidding history"></ol>
+  </section>
+  <section class="felt" aria-label="Playing table">
+    <div class="scorebar">
+      <div class="score"><span class="title">Your team · South + North</span><strong id="ours">0</strong></div>
+      <div class="score bid"><span class="title">Contract</span><strong id="contract">4 ♠</strong></div>
+      <div class="score"><span class="title">Opponents · West + East</span><strong id="theirs">0</strong></div>
+    </div>
+    <div class="table-grid">
+      <div class="seat north" id="seat-N"><span class="loc">North · opposite you</span><strong id="seat-title-N">Your partner</strong><span class="little" id="count-N">6 cards</span></div>
+      <div class="seat west" id="seat-W"><span class="loc">West · your left</span><strong id="seat-title-W">Opponent</strong><span class="little" id="count-W">6 cards</span></div>
+      <div class="center">
+        <div class="turn-head" id="turn-head">Trick 1 of 6</div>
+        <div class="hint" id="turn-hint" aria-live="polite">West leads first.</div>
+        <div class="plays" id="trick-plays"></div>
+      </div>
+      <div class="seat east" id="seat-E"><span class="loc">East · your right</span><strong id="seat-title-E">Opponent</strong><span class="little" id="count-E">6 cards</span></div>
+      <div class="seat south" id="seat-S"><span class="loc">South · you</span><strong id="seat-title-S">You</strong><span class="little" id="count-S">6 cards</span></div>
+    </div>
+    <div class="hand">
+      <h2 id="hand-title">Your remaining cards · Spades are trump</h2>
+      <p id="hand-help">Reveal <strong>one card at a time</strong> with Next card. On your turn, choose a highlighted card. Press Next trick once all four players have played.</p>
+      <div class="handcards" id="hand-cards"></div>
+      <div class="controls" style="justify-content:center">
+        <button id="next-card" class="btn" type="button">Next card →</button>
+        <button id="next" class="btn secondary" type="button" disabled>Next trick →</button>
+      </div>
+    </div>
+  </section>
+  <div class="lower">
+    <section class="panel" aria-live="polite">
+      <h2>Table commentary</h2>
+      <p class="status" id="status">Press Next card to reveal West's opening lead.</p>
+      <p class="callout" id="coach">The player to the left of the winning bidder leads first. Press Next card to reveal one play at a time.</p>
+      <p class="note" id="rules-note"><strong>Rules in use:</strong> 24 cards (9–A); partners opposite; play moves to the left; the opponent left of the winning bidder opens; follow suit if able. In a trump suit, the same-suit Jack is right bower and the same-colour Jack is left bower.</p>
+    </section>
+    <section class="panel">
+      <h2>Completed tricks</h2>
+      <div class="table-scroll">
+        <table aria-label="History of completed tricks">
+          <thead><tr><th>#</th><th>Lead</th><th>West</th><th>North</th><th>East</th><th>You</th><th>Won by</th></tr></thead>
+          <tbody id="history"><tr><td colspan="7">No completed tricks yet.</td></tr></tbody>
+        </table>
+      </div>
+      <div class="controls">
+        <button class="btn" id="view-strategy" type="button" hidden>View strategy review ↓</button>
+        <button class="btn secondary" id="reveal" type="button" hidden>Reveal original four hands</button>
+      </div>
+      <div class="review" id="review"><h3>Original hands · Postmortem</h3><div id="deal-review"></div></div>
+      <p class="note">This teaching simulator deals from the complete 24-card deck. It uses simple rule-following opponents, not your developed game's robots. <strong>Replay hand</strong> preserves the deal and contract; <strong>Rebid this deal</strong> preserves the cards but restarts bidding; <strong>New deal + bidding</strong> shuffles. Your existing game remains unchanged.</p>
+    </section>
+  </div>
+  <section id="strategy-review" class="panel strategy-panel" hidden aria-labelledby="strategy-heading">
+    <h2 id="strategy-heading">Post-hand strategy review</h2>
+    <p class="strategy-intro">A coaching review of the <strong>actual completed deal</strong>. We distinguish what your hand suggested when bidding from what became apparent during play. The observations are teaching aids, not claims of perfect strategy.</p>
+    <div class="strategy-grid">
+      <div class="analysis-box">
+        <h3>Bidding assessment</h3>
+        <div id="bid-analysis"></div>
+      </div>
+      <div class="analysis-box">
+        <h3>Key plays and lessons</h3>
+        <ol class="moments" id="key-moments"></ol>
+      </div>
+    </div>
+    <div class="what-if">
+      <h3 class="strategy-subhead">Explore an alternative play</h3>
+      <p class="strategy-intro">Choose any trick to inspect what you knew when it was your turn and which cards were legal. Where you played fourth, we can compare the <em>immediate trick winner</em> with a different card while keeping the first three cards unchanged.</p>
+      <div class="review-fields">
+        <label for="review-trick">Trick to examine
+          <select id="review-trick"><option value="0">Trick 1</option><option value="1">Trick 2</option><option value="2">Trick 3</option><option value="3">Trick 4</option><option value="4">Trick 5</option><option value="5">Trick 6</option></select>
+        </label>
+        <label for="alternative-card">Your possible play
+          <select id="alternative-card"></select>
+        </label>
+      </div>
+      <p id="review-context" class="analysis-note"></p>
+      <div id="alternative-result" class="alt-result" aria-live="polite"></div>
+    </div>
+    <p class="analysis-note"><strong>Important:</strong> All what-if conclusions apply only to the single trick shown. Changing a card changes the remaining hands and may alter later leads and robot decisions. To test the entire hand, use <strong>Replay hand</strong> above. The computer opponents use simple practice heuristics, not the robots in the family game.</p>
+    <div class="controls"><button id="review-replay" type="button" class="btn">↻ Replay and try another approach</button></div>
+  </section>
+</div>
+<script>
+'use strict';
+const SUITS=['S','H','C','D'];
+// Display only: printed suits ♠ ♥ ♣ ♦, with highest rank first within each suit.
+// Do not change SUITS, DECK, the stored deal, legal play or robot strategy.
+const DISPLAY_SUITS=['S','H','C','D'];
+const DISPLAY_RANKS=['A','K','Q','J','T','9'];
+function sortHandForDisplay(cards){return [...cards].sort((a,b)=>DISPLAY_SUITS.indexOf(a[1])-DISPLAY_SUITS.indexOf(b[1]) || DISPLAY_RANKS.indexOf(a[0])-DISPLAY_RANKS.indexOf(b[0]));}
+const ICON={S:'♠',H:'♥',C:'♣',D:'♦',NT:'NT'};
+const SUITNAME={S:'Spades',H:'Hearts',C:'Clubs',D:'Diamonds',NT:'No trump'};
+const RANKS=['9','T','J','Q','K','A'];
+const LABEL={W:'West',N:'Partner',E:'East',S:'You'};
+// Clockwise on the diagram, moving to each player's left:
+// West → North (partner) → East → South (you) → West.
+const ORDER=['W','N','E','S'];
+const FIXED={S:['JS','AS','KS','AH','KC','9D'],W:['AC','JC','QD','KH','TC','TH'],N:['QS','TS','QH','9H','KD','9C'],E:['9S','JH','QC','TD','JD','AD']};
+const DECK=SUITS.flatMap(s=>RANKS.map(r=>r+s));
+const el=id=>document.getElementById(id);
+let deal,contract,phase,state,bidding,dealer='S',dealIndex=0;
+function assertDeal(hands){let cards=Object.values(hands).flat();if(cards.length!==24||new Set(cards).size!==24||DECK.some(c=>!cards.includes(c)))throw Error('Invalid full 24-card deal');}
+function cloneHands(h){return Object.fromEntries(ORDER.map(p=>[p,[...h[p]]]));}
+function shuffleDeck(){const cards=[...DECK];for(let i=cards.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[cards[i],cards[j]]=[cards[j],cards[i]];}return cards;}
+function shuffleDeal(){const cards=shuffleDeck();let h={};ORDER.forEach((p,i)=>h[p]=cards.slice(6*i,6*i+6));assertDeal(h);return h;}
+// A bid states only the number of tricks. Naming trump happens AFTER the auction.
+function bidText(b){return b.level===7?'Horse':`${b.level} tricks`;}
+function contractText(b){return `${b.level===7?'Horse':b.level+' tricks'} · ${SUITNAME[b.trump]}`;}
+function contractLabel(){return !contract?'—':(contract.level===7?'Horse':contract.level)+' '+ICON[contract.trump];}
+function otherBowerSuit(t){return ({S:'C',C:'S',H:'D',D:'H'})[t];}
+function suit(card){return contract.trump!=='NT'&&card[0]==='J'&&card[1]===otherBowerSuit(contract.trump)?contract.trump:card[1];}
+function isTrump(card){return contract.trump!=='NT'&&suit(card)===contract.trump;}
+function power(card){if(contract.trump!=='NT'){
+ if(card==='J'+contract.trump)return 200;
+ if(card==='J'+otherBowerSuit(contract.trump))return 190;
+ if(isTrump(card))return 130+RANKS.indexOf(card[0])*5;
+}return RANKS.indexOf(card[0])+1;}
+function beats(a,b,led){const sa=suit(a),sb=suit(b),t=contract.trump;
+ if(t!=='NT'&&sa===t&&sb!==t)return true;
+ if(t!=='NT'&&sb===t&&sa!==t)return false;
+ if(sa!==sb)return sa===led&&sb!==led;
+ return power(a)>power(b);}
+function currentWinner(plays){if(!plays.length)return null;const led=suit(plays[0].card);let best=plays[0];for(const p of plays.slice(1))if(beats(p.card,best.card,led))best=p;return best;}
+function legalCards(player){const hand=state.hands[player];if(!state.plays.length)return [...hand];const led=suit(state.plays[0].card),matching=hand.filter(c=>suit(c)===led);return matching.length?matching:[...hand];}
+function sortLow(cards){return [...cards].sort((a,b)=>(power(a)-power(b))||(SUITS.indexOf(a[1])-SUITS.indexOf(b[1])));}
+function chooseBotCard(player){const opts=legalCards(player);if(!state.plays.length){
+ // On the original teaching deal, reproduce the familiar A♣ opening lead.
+ if(dealIndex===0&&state.trickNumber===1&&player==='W'&&contract.player==='S'&&contract.trump==='S'&&opts.includes('AC'))return 'AC';
+ const outside=opts.filter(c=>!isTrump(c));
+ const aces=outside.filter(c=>c[0]==='A');
+ if(aces.length)return aces[0];
+ if(outside.length)return [...outside].sort((a,b)=>power(b)-power(a))[0];
+ return [...opts].sort((a,b)=>power(b)-power(a))[0];
+ }
+ const winner=currentWinner(state.plays),partnerWinning=(player==='S'||player==='N')===(winner.player==='S'||winner.player==='N');
+ if(partnerWinning)return sortLow(opts)[0];
+ const winning=opts.filter(c=>beats(c,winner.card,suit(state.plays[0].card)));
+ if(winning.length)return sortLow(winning)[0];
+ return sortLow(opts)[0];}
+function pretty(card){return (card[0]==='T'?'10':card[0])+ICON[card[1]];}
+function colored(card){return card[1]==='H'||card[1]==='D';}
+function ariaCard(card){const ranks={A:'Ace',K:'King',Q:'Queen',J:'Jack',T:'Ten','9':'Nine'},suits={S:'spades',H:'hearts',C:'clubs',D:'diamonds'};return `${ranks[card[0]]} of ${suits[card[1]]}`;}
+function cardHTML(card,{mini=false,button=false,legal=false,disabled=false,suitStart=false}={}){let tag=button?'button':'div';let cl=`card ${colored(card)?'red':''} ${mini?'mini':''} ${button?(legal?'legal':'illegal'):''} ${suitStart?'suit-start':''}`;
+ return `<${tag} class="${cl}" ${button?`type="button" data-card="${card}" aria-label="Play ${ariaCard(card)}" ${disabled?'disabled':''}`:''}><span>${card[0]==='T'?'10':card[0]}</span><small>${ICON[card[1]]}</small></${tag}>`;}
+function updateControls(){el('restart').disabled=(!contract||phase!=='play');}
+function startPlay(){
+ if(!contract)return;
+ phase='play';state={hands:cloneHands(deal),turn:ORDER.indexOf(ORDER[(ORDER.indexOf(contract.player)+1)%4]),plays:[],trickNumber:1,history:[],count:{ours:0,theirs:0},completed:false,winner:null,ended:false};
+ el('bidding-phase').hidden=true;
+ el('reveal').hidden=true;el('view-strategy').hidden=true;el('strategy-review').hidden=true;el('review').classList.remove('show');el('reveal').textContent='Reveal original four hands';
+ render();
+}
+function newDeal(allPass=false){
+ // Preserve the dealer following an all-pass redeal; otherwise rotate dealer one seat to the left.
+ if(!allPass){dealer=ORDER[(ORDER.indexOf(dealer)+1)%4];}
+ deal=shuffleDeal();dealIndex++;
+ startBidding();
+}
+function startBidding(){
+ assertDeal(deal);contract=null;phase='bidding';state=null;
+ bidding={turn:ORDER[(ORDER.indexOf(dealer)+1)%4],count:0,history:[],highest:null,finished:false};
+ el('bid-level').value='';el('bid-trump').value='';
+ el('bidding-phase').hidden=false;el('review').classList.remove('show');el('reveal').hidden=true;el('view-strategy').hidden=true;el('strategy-review').hidden=true;
+ render();
+}
+function strongestBotTrump(player){
+ // Evaluate ONLY this player's own six cards, not any hidden opponent cards.
+ const hand=deal[player];let strongest=null;
+ for(const trump of [...SUITS,'NT']){
+  let score=0;
+  for(const card of hand){
+   const rank=card[0],originalSuit=card[1];
+   if(trump!=='NT'&&rank==='J'&&originalSuit===trump)score+=1.1;
+   else if(trump!=='NT'&&rank==='J'&&originalSuit===otherBowerSuit(trump))score+=.95;
+   else if(originalSuit===trump&&trump!=='NT')score+=({A:.90,K:.75,Q:.42,T:.23,'9':.14})[rank];
+   else score+=({A:.76,K:.24,Q:.08,J:.035,T:.015,'9':0})[rank];
+  }
+  const trumps=trump==='NT'?0:hand.filter(c=>c[1]===trump||(c[0]==='J'&&c[1]===otherBowerSuit(trump))).length;
+  if(trumps>=4)score+=.24;
+  if(strongest===null||score>strongest.score)strongest={score,trump};
+ }
+ let level=strongest.score>=5.7?6:strongest.score>=4.65?5:strongest.score>=3.75?4:strongest.score>=2.95?3:0;
+ return {level,trump:strongest.trump};
+}
+function botBid(player){
+ const estimation=strongestBotTrump(player);
+ return {level:(!estimation.level||bidding.highest&&estimation.level<=bidding.highest.level)?0:estimation.level};
+}
+function placeBid(player,{level}){
+ if(phase!=='bidding'||bidding.finished||bidding.turn!==player)throw Error('Wrong bidding turn');
+ if(level!==0){if(!(level>=3&&level<=7)||bidding.highest&&level<=bidding.highest.level)throw Error('Bid must exceed current high bid');bidding.highest={player,level};}
+ bidding.history.push({player,level});bidding.count++;
+ if(bidding.count===4||level===7){
+  bidding.finished=true;
+  // Robots name their trump only when all bidding has finished.
+  // A human winner makes a separate independent choice on screen.
+  if(bidding.highest&&bidding.highest.player!=='S'){
+   const t=strongestBotTrump(bidding.highest.player).trump;
+   contract={...bidding.highest,trump:t};
+  }
+ }else bidding.turn=ORDER[(ORDER.indexOf(player)+1)%4];
+ el('bid-level').value='';render();
+}
+function nextBid(){if(phase!=='bidding'||bidding.finished||bidding.turn==='S')return;const player=bidding.turn;placeBid(player,botBid(player));}
+function submitBid(){if(phase!=='bidding'||bidding.finished||bidding.turn!=='S')return;const raw=el('bid-level').value;if(!raw)return;
+ if(raw==='pass'){placeBid('S',{level:0});return;}
+ let level=Number(raw);if(level>(bidding.highest?.level??0))placeBid('S',{level});}
+function nameTrump(){
+ if(phase!=='bidding'||!bidding.finished||bidding.highest?.player!=='S'||contract)return;
+ const trump=el('bid-trump').value;
+ if(![...SUITS,'NT'].includes(trump))return;
+ contract={...bidding.highest,trump};render();
+}
+function updateBidForm(){
+ const value=el('bid-level').value;
+ const active=phase==='bidding'&&!bidding.finished&&bidding.turn==='S';
+ const valid=active&&(value==='pass'||value!==''&&Number(value)>(bidding.highest?.level??0));
+ el('submit-bid').disabled=!valid;
+ let message='Choose a number of tricks or Pass. Trump will be named only by the auction winner afterward.';
+ if(value==='pass')message='Pass: you will not name trump unless you already hold the winning bid.';
+ else if(value&&Number(value)<=(bidding.highest?.level??0))message='This bid is not high enough. You must increase the current high bid or pass.';
+ el('bid-feedback').textContent=message;
+}
+function renderBidding(){
+ const active=phase==='bidding';el('bidding-phase').hidden=!active;
+ if(!active)return;
+ const finished=bidding.finished,human=!finished&&bidding.turn==='S';
+ const pendingTrump=finished&&bidding.highest?.player==='S'&&!contract;
+ const allPassed=finished&&!bidding.highest;
+ el('bidding-title').textContent=`Bidding round · Deal ${dealIndex+1}`;
+ if(!finished){
+  el('bidding-status').textContent=`Dealer: ${LABEL[dealer]}. ${LABEL[bidding.turn]} ${human?'— your decision':'to bid next'}. ${bidding.count} of 4 bidding turns completed. Current high bid: ${bidding.highest?bidText(bidding.highest):'none'}. No trump suit is named during bidding.`;
+ }else if(pendingTrump){
+  el('bidding-status').textContent=`You won the bidding with ${bidText(bidding.highest)}. Now, and only now, choose Spades, Hearts, Clubs, Diamonds, or No Trump.`;
+ }else if(contract){
+  el('bidding-status').textContent=`${LABEL[contract.player]} won the bidding with ${bidText(contract)} and then named ${SUITNAME[contract.trump]}. ${LABEL[ORDER[(ORDER.indexOf(contract.player)+1)%4]]} has the opening lead.`;
+ }else{
+  el('bidding-status').textContent='Everyone passed. The same dealer must redeal.';
+ }
+ el('bid-entry').hidden=!human;
+ el('bot-bid-controls').hidden=finished||human;
+ el('trump-choice').hidden=!pendingTrump;
+ el('bid-trump').disabled=!pendingTrump;
+ el('confirm-trump').disabled=!pendingTrump||![...SUITS,'NT'].includes(el('bid-trump').value);
+ el('bidding-complete').hidden=!finished||pendingTrump;
+ el('begin-play').hidden=!contract;
+ el('redeal-pass').hidden=!allPassed;
+ if(human){
+  for(const option of el('bid-level').options)if(option.value&&option.value!=='pass')option.disabled=Number(option.value)<=(bidding.highest?.level??0);
+  updateBidForm();
+ }
+ el('bid-info').textContent=pendingTrump
+  ?'Only you, as the winning bidder, can name trump. Choose a suit or No Trump, then confirm before starting play.'
+  :contract?`Contract: ${contractText(contract)}. Opening leader: ${LABEL[ORDER[(ORDER.indexOf(contract.player)+1)%4]]}. Partners sit opposite; every trick proceeds left.`
+  :allPassed?'All four players passed. Press All passed — redeal to shuffle again, keeping the same dealer.'
+  :'Bid 3, 4, 5, 6, Horse or Pass; higher bids overtake lower bids. Trump is chosen by the winning bidder AFTER the bidding round. The robots judge bids using their own hands.';
+ el('bid-history').innerHTML=bidding.history.map(b=>`<li class="${bidding.highest?.player===b.player&&b.level>0?'high':''}">${LABEL[b.player]}: ${b.level?bidText(b):'Pass'}</li>`).join('');
+}
+function playCard(player,card){if(!state.hands[player].includes(card)||!legalCards(player).includes(card))throw Error('Illegal card: '+player+' '+card);
+ if(player!==ORDER[state.turn])throw Error('Wrong turn');
+ state.hands[player].splice(state.hands[player].indexOf(card),1);
+ state.plays.push({player,card});state.turn=(state.turn+1)%4;
+ if(state.plays.length===4){let winner=currentWinner(state.plays);state.count[['S','N'].includes(winner.player)?'ours':'theirs']++;
+ state.completed=true;state.winner=winner.player;
+ state.history.push({plays:state.plays.map(p=>({...p})),winner:winner.player,lead:state.plays[0].player});}
+}
+function nextCard(){if(phase!=='play'||state.completed||state.ended||ORDER[state.turn]==='S')return;let player=ORDER[state.turn];playCard(player,chooseBotCard(player));render();}
+function nextTrick(){if(phase!=='play'||!state.completed||state.ended)return;state.trickNumber++;state.turn=ORDER.indexOf(state.winner);state.plays=[];state.completed=false;state.winner=null;render();}
+function finishHandIfNeeded(){if(state.completed&&state.trickNumber===6){state.ended=true;el('reveal').hidden=false;el('view-strategy').hidden=false;}}
+function resultMessage(){let biddingTeam=['N','S'].includes(contract.player)?'ours':'theirs',tricks=state.count[biddingTeam],made=tricks>=contract.level||contract.level===7&&tricks===6;
+ let score=contract.level===7?12:contract.level;
+ return {made,tricks,points:(made?'+':'−')+score,team:biddingTeam,who:LABEL[contract.player]};}
+function coaching(){if(state.ended){let r=resultMessage();return `${r.who}'s ${bidText(contract)} bid ${r.made?'succeeded':'failed'}: bidding team took ${r.tricks} tricks; ${r.points} contract points. Reveal the original hands, replay this deal, or try a new deal and bidding round.`;}
+ if(state.completed){let last=state.history[state.history.length-1],winner=currentWinner(last.plays),led=suit(last.plays[0].card),message=`${LABEL[last.winner]} won trick ${state.trickNumber} with ${pretty(winner.card)}. `;
+ if(dealIndex===0&&state.trickNumber===1&&last.plays[0].card==='AC'&&contract.trump==='S')message+='On A♣ you must follow clubs with K♣. J♣ is the left bower, treated as spades.';
+ else if(isTrump(winner.card)&&led!==contract.trump)message+='Trump defeated the led suit.';
+ else if(contract.trump!=='NT'&&winner.card==='J'+contract.trump)message+='The right bower is unbeatable.';
+ else message+='Consider which top trump and outside winners still remain.';return message;
+ }
+ let player=ORDER[state.turn];if(player!=='S')return `Press Next card to reveal ${LABEL[player]}'s ${state.plays.length===0?'lead':'play'}. Only one card will appear.`;
+ let legal=legalCards('S');if(!state.plays.length)return 'You have the lead. Choose a card and consider your partnership’s target.';
+ let led=suit(state.plays[0].card),mustFollow=state.hands.S.some(c=>suit(c)===led);
+ if(mustFollow&&legal.length===1)return `You must follow ${ICON[led]} with ${pretty(legal[0])}.`;
+ if(mustFollow)return `You must follow ${ICON[led]}. Choose one of your highlighted cards.`;
+ return `You have no ${ICON[led]}: choose a discard or trump as appropriate.`;
+}
+// The coaching engine works from the full *finished* deal. It never influences robot bids or play.
+// Reconstruct the exact hand and legal choices the human had at each decision.
+function southDecision(trickIndex){
+ const hands=cloneHands(deal);
+ for(let t=0;t<trickIndex;t++)for(const play of state.history[t].plays){
+  const pos=hands[play.player].indexOf(play.card);
+  if(pos<0)throw Error('Review: missing previously played card');
+  hands[play.player].splice(pos,1);
+ }
+ const trick=state.history[trickIndex],position=trick.plays.findIndex(p=>p.player==='S');
+ const before=trick.plays.slice(0,position),ourHand=[...hands.S];
+ let legal=ourHand;
+ if(before.length){
+  const led=suit(before[0].card),matching=ourHand.filter(c=>suit(c)===led);
+  if(matching.length)legal=matching;
+ }
+ return {trick,position,before,ourHand,legal,played:trick.plays[position].card};
+}
+function side(player){return ['S','N'].includes(player)?'ours':'theirs';}
+function englishList(cards){return cards.map(pretty).join(', ');}
+function bidHandMetrics(hand,trump){
+ if(trump==='NT')return {trumps:0,right:false,left:false,aces:hand.filter(c=>c[0]==='A').length,score:hand.reduce((v,c)=>v+({A:.95,K:.38,Q:.13,J:.05,T:0,'9':0})[c[0]],0)};
+ const left='J'+otherBowerSuit(trump),right='J'+trump;
+ const trumpCards=hand.filter(c=>c[1]===trump||c===left);
+ let score=0;
+ for(const c of hand){
+  if(c===right)score+=1.1;
+  else if(c===left)score+=1;
+  else if(c[1]===trump)score+=({A:.95,K:.75,Q:.42,T:.22,'9':.12})[c[0]];
+  else score+=({A:.72,K:.22,Q:.07,J:.02,T:0,'9':0})[c[0]];
+ }
+ if(trumpCards.length>=4)score+=.25;
+ if(trumpCards.length>=5)score+=.35;
+ return {trumps:trumpCards.length,right:hand.includes(right),left:hand.includes(left),aces:hand.filter(c=>c[0]==='A'&&!trumpCards.includes(c)).length,score};
+}
+function reviewBid(){
+ const humanEntry=bidding?.history?.find(e=>e.player==='S');
+ const original=humanEntry===undefined;
+ const chosen=original?{level:4,trump:'S'}:{...humanEntry,...(contract.player==='S'?{trump:contract.trump}:{})};
+ const humanCards=deal.S;
+ const humanWon=contract.player==='S';
+ let lines=[];
+ if(original){
+  lines.push('<p><span class="strategy-tag">Original practice hand</span> Your starting contract was <strong>4 Spades</strong>, without a bidding round.</p>');
+ }else if(chosen.level===0){
+  lines.push('<p><span class="strategy-tag">Your bid: Pass</span> You declined to bid. That can be sound when you lack control cards or another player has raised the price.</p>');
+ }else if(!humanWon){
+  lines.push(`<p><span class="strategy-tag">Your bid: ${bidText(chosen)}</span> You did not win the bidding, so you correctly had no opportunity to name trump. It would be misleading to assess your bid as if you had chosen a suit.</p>`);
+  const aces=humanCards.filter(c=>c[0]==='A').length;
+  lines.push(`<p>You held <strong>${aces} ace${aces===1?'':'s'}</strong>. Your potential in any trump suit also depends on the bowers, the opening lead, and your partner's cards.</p>`);
+ }else{
+  const m=bidHandMetrics(humanCards,contract.trump);
+  let evaluation;
+  if(chosen.level===7){
+   evaluation=m.trumps>=5&&m.right&&m.left?'A strong Horse candidate on paper, though the opponent’s opening lead still matters.':'An ambitious Horse: all six tricks must be won. Bowers and opening-lead risk are especially important.';
+  }else{
+   const gap=chosen.level-m.score;
+   evaluation=gap>1.1?'Ambitious for these six cards. You may need help from your partner or a favourable distribution.':gap<-.75?'Conservative relative to the visible honour-card strength. The opening lead and missing trump still matter.':'Reasonable on the strength of your own cards, but not a guarantee.';
+  }
+  lines.push(`<p><span class="strategy-tag">Your bid: ${bidText(chosen)} · You named ${SUITNAME[contract.trump]} afterward</span> ${evaluation}</p>`);
+  if(contract.trump==='NT')lines.push(`<p>You had <strong>${m.aces} ace${m.aces===1?'':'s'}</strong> for no trump. Suit winners can still be overtaken by higher cards; there is no trump protection.</p>`);
+  else lines.push(`<p>Your chosen trump gave you <strong>${m.trumps} effective trump</strong>${m.right?', including the right bower':''}${m.left?', including the left bower':''}, and <strong>${m.aces} outside ace${m.aces===1?'':'s'}</strong>. ${!m.left?'The left bower was outside your hand. ':''}An outside ace can be trumped.</p>`);
+ }
+ if(humanWon){
+  const r=resultMessage();
+  lines.push(`<p><strong>Actual result:</strong> your partnership took ${r.tricks} of 6 tricks against a ${contract.level===7?'Horse':contract.level+'-trick'} target. Your bid ${r.made?'made':'missed'} (${r.points} points).</p>`);
+ }else{
+  lines.push(`<p><strong>Actual contract:</strong> ${LABEL[contract.player]} won with ${bidText(contract)} and then named ${SUITNAME[contract.trump]}. Your partnership took ${state.count.ours} trick${state.count.ours===1?'':'s'}. This result cannot fairly test your own ${chosen.level?bidText(chosen):'pass'} as if you had won the bidding.</p>`);
+ }
+ lines.push('<p class="analysis-note">The assessment uses your original six cards and the public bidding history. It is a heuristic, not a calculation of guaranteed tricks or access to hidden hands.</p>');
+ el('bid-analysis').innerHTML=lines.join('');
+}
+function outstandingOpponentTrump(beforeTrick){
+ let opponentHand=['W','E'].flatMap(p=>deal[p]);
+ for(let t=0;t<beforeTrick;t++)for(const play of state.history[t].plays){
+  if(!['W','E'].includes(play.player))continue;
+  opponentHand=opponentHand.filter(c=>c!==play.card);
+ }
+ return opponentHand.filter(isTrump).length;
+}
+function makeMoments(){
+ const moments=[];
+ const first=state.history[0];
+ if(first){
+  const lead=first.plays[0];
+  moments.push(`<strong>Opening lead, trick 1:</strong> ${LABEL[lead.player]} led ${pretty(lead.card)}. The player immediately left of the winning bidder always has the first lead; the bidder cannot assume control.`);
+ }
+ let rightNote=false,aceNote=false,partnerNote=false,forcedNote=false,comparisonNote=false;
+ for(let i=0;i<state.history.length;i++){
+  const info=southDecision(i),tr=info.trick,c=info.played,led=suit(tr.plays[0].card);
+  const winner=currentWinner(tr.plays);
+  if(!forcedNote&&info.legal.length===1&&info.before.length&&info.ourHand.length>1){
+   moments.push(`<strong>Trick ${i+1} · forced follow:</strong> ${pretty(c)} was your only legal play when ${ICON[led]} was led. That was a rule requirement, not a choice to criticise.`);
+   forcedNote=true;
+  }
+  if(!rightNote&&contract.trump!=='NT'&&c==='J'+contract.trump){
+   const others=tr.plays.filter(p=>p.player!=='S'&&isTrump(p.card)).length;
+   moments.push(`<strong>Trick ${i+1} · trump control:</strong> You played ${pretty(c)}, the unbeatable right bower${winner.player==='S'?', and won the trick':''}. ${others} other trump ${others===1?'card was':'cards were'} played on this trick. Counting remaining trump helps decide when outside aces are safe.`);
+   rightNote=true;
+  }
+  if(!aceNote&&c[0]==='A'&&!isTrump(c)){
+   const count=outstandingOpponentTrump(i),won=winner.player==='S';
+   moments.push(`<strong>Trick ${i+1} · outside ace:</strong> You played ${pretty(c)} and ${won?'won':'did not win'} the trick. ${count?'At the start of this trick, opponents still held '+count+' trump card'+(count===1?'':'s')+' in the full deal.':'By this trick, the opponents had no trump remaining.'} ${count?'That illustrates why drawing trump can matter.':''}`);
+   aceNote=true;
+  }
+  if(!partnerNote&&winner.player==='N'){
+   moments.push(`<strong>Trick ${i+1} · partnership:</strong> Your partner won the trick with ${pretty(winner.card)}. Evaluate the team’s tricks, not just the ones you personally take.`);
+   partnerNote=true;
+  }
+  if(!comparisonNote&&info.position===3&&info.legal.length>1){
+   const actualTeam=side(tr.winner)==='ours';
+   const changed=info.legal.filter(a=>a!==c).map(a=>({card:a,winner:currentWinner([...info.before,{player:'S',card:a}]).player})).find(a=>side(a.winner)!==(actualTeam?'ours':'theirs'));
+   if(changed){
+    moments.push(`<strong>Trick ${i+1} · choice mattered:</strong> You played ${pretty(c)}. With the other three cards already on the table, ${pretty(changed.card)} would have ${side(changed.winner)==='ours'?'won':'lost'} this particular trick for your team. Use the what-if control to examine it; later tricks would change.`);
+    comparisonNote=true;
+   }
+  }
+  if(moments.length>=5)break;
+ }
+ if(moments.length<3){
+  const won=state.count.ours;
+  moments.push(`<strong>Six-trick perspective:</strong> Your partnership won ${won} trick${won===1?'':'s'}. Replay the identical deal to see whether different timing of trump or outside aces changes that outcome.`);
+ }
+ el('key-moments').innerHTML=moments.slice(0,5).map(x=>`<li>${x}</li>`).join('');
+}
+function renderAlternative(){
+ if(!state?.ended)return;
+ const index=Number(el('review-trick').value),info=southDecision(index);
+ const choice=el('alternative-card').value;
+ const order=['first','second','third','fourth'][info.position];
+ const led=suit(info.trick.plays[0].card);
+ const beforeText=info.before.map(p=>`${LABEL[p.player]} ${pretty(p.card)}`).join(' → ');
+ const afterText=info.trick.plays.slice(info.position+1).map(p=>`${LABEL[p.player]} ${pretty(p.card)}`).join(' → ');
+ let description=`<strong>Your position:</strong> ${order} to play. Your card was <strong>${pretty(info.played)}</strong>. `;
+ description+=info.before.length?`Already on the table: ${beforeText}. `:'You had the opening lead. ';
+ description+=`<strong>Legal choices:</strong> ${englishList(info.legal)}. `;
+ description+=info.before.length&&(info.ourHand.some(c=>suit(c)===led))?`You had to follow ${ICON[led]}.`:'You could choose freely among these cards.';
+ if(afterText)description+=` After your play in the recorded game: ${afterText}.`;
+ el('review-context').innerHTML=description;
+ const box=el('alternative-result');
+ if(info.legal.length===1){
+  box.innerHTML=`<strong>No legal alternative.</strong> ${pretty(info.played)} was the only card you were allowed to play. Any different card would have broken the follow-suit rule.`;
+  return;
+ }
+ if(choice===info.played){
+  box.innerHTML=`<strong>Your actual play:</strong> ${pretty(info.played)}. ${LABEL[info.trick.winner]} won this trick. Choose a different legal card above to explore a possible alternative.`;
+  return;
+ }
+ if(!info.legal.includes(choice)){box.textContent='Choose a legal card from the list.';return;}
+ if(info.position!==3){
+  box.innerHTML=`<strong>Alternative: ${pretty(choice)}.</strong> This card was legal, but you played ${order}. Later players had not yet chosen their cards, so it would be misleading to declare that the trick winner would stay the same. <strong>Replay this hand</strong> to try it and see how the robots respond.`;
+  return;
+ }
+ const altWinner=currentWinner([...info.before,{player:'S',card:choice}]).player;
+ const actualWinner=info.trick.winner;
+ const changed=altWinner!==actualWinner;
+ let claim=changed?`The trick winner would change from <strong>${LABEL[actualWinner]}</strong> to <strong>${LABEL[altWinner]}</strong>.`:`<strong>${LABEL[actualWinner]}</strong> would still win this trick.`;
+ let sideClaim=side(altWinner)===side(actualWinner)?'Your partnership’s immediate trick count would be unchanged.':`That would ${side(altWinner)==='ours'?'gain':'cost'} your partnership one trick <em>at this point</em>.`;
+ box.innerHTML=`<strong>Alternative: ${pretty(choice)} instead of ${pretty(info.played)}.</strong> You were last to play, so the first three cards were already known. ${claim} ${sideClaim} The remaining hands, leads and later results might differ.`;
+}
+function renderReviewTrick(){
+ if(!state?.ended)return;
+ const n=Number(el('review-trick').value);
+ if(!Number.isInteger(n)||n<0||n>5)return;
+ const info=southDecision(n),select=el('alternative-card');
+ select.innerHTML=sortHandForDisplay(info.legal).map(c=>`<option value="${c}" ${c===info.played?'selected':''}>${pretty(c)}${c===info.played?' — played':''}</option>`).join('');
+ select.disabled=info.legal.length<2;
+ renderAlternative();
+}
+function renderStrategyReview(){
+ const ready=phase==='play'&&state.ended;
+ el('strategy-review').hidden=!ready;
+ el('view-strategy').hidden=!ready;
+ if(!ready)return;
+ // Update content when a hand finishes, not on every button press afterward.
+ if(el('strategy-review').dataset.dealKey!==dealIndex+'|'+contract.player+'|'+contract.level+'|'+contract.trump+'|'+state.history.map(tr=>tr.plays.map(p=>p.card).join(',')).join(';')){
+  el('strategy-review').dataset.dealKey=dealIndex+'|'+contract.player+'|'+contract.level+'|'+contract.trump+'|'+state.history.map(tr=>tr.plays.map(p=>p.card).join(',')).join(';');
+  reviewBid();makeMoments();el('review-trick').value='0';renderReviewTrick();
+ }
+}
+function render(){
+ el('deal-summary').textContent=dealIndex===0?(phase==='bidding'?'Original practice deal · Bid independently; the winner names trump after bidding.':'Original practice deal · 4 Spades bid. Replay this hand, rebid the same cards, or start a new deal.'):`Deal ${dealIndex+1} · ${phase==='bidding'?'Bid independently; name trump only if you win.':contractText(contract)+' · '+LABEL[contract.player]+' won the bidding.'}`;
+ el('contract').textContent=phase==='play'?contractLabel():'—';
+ el('hand-title').textContent=`Your ${phase==='bidding'?'six cards · Bidding round':'remaining cards · '+SUITNAME[contract.trump]+(contract.trump==='NT'?'':' trump')}`;
+ el('hand-help').textContent=phase==='bidding'?'Look over your six cards before choosing your bid. No bid is preselected.': 'Press Next card to reveal one opponent or partner card. On your turn, choose a highlighted card. Press Next trick when all four have played.';
+ renderBidding();
+ el('ours').textContent=state?state.count.ours:0;el('theirs').textContent=state?state.count.theirs:0;
+ for(const p of ORDER){
+  const seatName={W:'Opponent',N:'Your partner',E:'Opponent',S:'You'}[p];
+  const openingLeader=contract&&phase==='play'?ORDER[(ORDER.indexOf(contract.player)+1)%4]:null;
+  el('seat-title-'+p).textContent=seatName+(contract&&phase==='play'&&contract.player===p?' · winning bidder':'')+(p===openingLeader?' · opening leader':'');
+  el('count-'+p).textContent=(state?state.hands[p]:deal[p]).length+' '+((state?state.hands[p]:deal[p]).length===1?'card':'cards')+' remaining';
+  el('seat-'+p).classList.toggle('active',state?!state.completed&&ORDER[state.turn]===p:!bidding.finished&&bidding.turn===p);}
+ el('turn-head').textContent=phase==='bidding'?'Bidding phase':state.ended?'Hand complete':`Trick ${state.trickNumber} of 6`;
+ const humanTurn=phase==='play'&&!state.completed&&ORDER[state.turn]==='S';
+ const legal=humanTurn?legalCards('S'):[];
+ let cards=sortHandForDisplay(state?state.hands.S:deal.S);
+ el('hand-cards').innerHTML=cards.length?cards.map((c,i)=>cardHTML(c,{button:phase==='play',legal:legal.includes(c),disabled:!legal.includes(c),suitStart:i>0&&c[1]!==cards[i-1][1]})).join(''):'<div class="empty">All six cards played.</div>';
+ el('hand-cards').querySelectorAll('button[data-card]').forEach(b=>b.addEventListener('click',()=>{
+  const card=b.dataset.card;if(!humanTurn||!legalCards('S').includes(card))return;playCard('S',card);render();}));
+ if(phase==='bidding'){
+  el('trick-plays').innerHTML='';el('turn-hint').textContent='Your own six cards are visible below.';
+  el('next-card').disabled=true;el('next').disabled=true;
+  el('next-card').textContent='Next card →';el('next').textContent='Next trick →';
+  el('status').innerHTML='<strong>Bidding.</strong> Complete one round before starting the six tricks.';
+  el('coach').textContent='Bids are numbers only. The robots take their turns only when you press Next bid. When bidding is finished, the winner names trump, and play moves to the left.';
+  el('history').innerHTML='<tr><td colspan="7">No tricks played yet.</td></tr>';
+  updateControls();el('strategy-review').hidden=true;el('view-strategy').hidden=true;return;
+ }
+ finishHandIfNeeded();
+ el('trick-plays').innerHTML=state.plays.map(p=>`<div class="play"><div>${cardHTML(p.card,{mini:true})}</div><div class="who">${LABEL[p.player]}</div>${state.completed&&p.player===state.winner?'<div class="winning">✓ Winner</div>':''}</div>`).join('');
+ if(state.completed)el('turn-hint').textContent=state.ended?`Final: ${state.count.ours}–${state.count.theirs} tricks`:`${LABEL[state.winner]} won · four cards played`;
+ else if(humanTurn)el('turn-hint').textContent=`Your turn · ${state.plays.length} of 4 cards played — select your card`;
+ else el('turn-hint').textContent=`${LABEL[ORDER[state.turn]]} to play · ${state.plays.length} of 4 cards played`;
+ const botTurn=!state.completed&&!state.ended&&!humanTurn;
+ el('next-card').disabled=!botTurn;el('next-card').textContent=botTurn?'Next card →':humanTurn?'Your turn — choose card':'Next card →';
+ el('next').disabled=!state.completed||state.ended;el('next').textContent=state.ended?'Hand complete ✓':'Next trick →';
+ const status=el('status');
+ if(state.ended){let r=resultMessage();status.innerHTML=`<strong>${r.made?'Bid made!':'Bid missed.'}</strong> ${r.who} bid ${bidText(contract)} and ${r.made?'made':'missed'} it. Your team took <strong>${state.count.ours}</strong> tricks; bidding team: <strong>${r.points}</strong> points.`;}
+ else if(state.completed)status.innerHTML=`<strong>Trick ${state.trickNumber} complete.</strong> ${LABEL[state.winner]} won. Your team: ${state.count.ours}; opponents: ${state.count.theirs}. Press <strong>Next trick</strong>.`;
+ else if(humanTurn)status.innerHTML=`<strong>Your turn.</strong> ${state.plays.length} of four cards have been played. Select a highlighted card.`;
+ else status.innerHTML=`<strong>${LABEL[ORDER[state.turn]]} to play.</strong> Press <strong>Next card</strong> to reveal their play (${state.plays.length+1} of 4).`;
+ el('coach').textContent=coaching();
+ el('history').innerHTML=state.history.length?state.history.map((tr,i)=>{
+  const bySeat=Object.fromEntries(tr.plays.map(p=>[p.player,p.card]));
+  return `<tr><td>${i+1}</td><td>${LABEL[tr.lead]}</td>${ORDER.map(p=>`<td style="${colored(bySeat[p])?'color:#bb2038':''}">${pretty(bySeat[p])}</td>`).join('')}<td><span class="pill">${LABEL[tr.winner]}</span></td></tr>`;
+ }).join(''):'<tr><td colspan="7">No completed tricks yet.</td></tr>';
+ updateControls();renderStrategyReview();
+}
+el('restart').addEventListener('click',()=>{if(contract)startPlay();});
+el('rebid').addEventListener('click',startBidding);
+el('new-deal').addEventListener('click',()=>newDeal(false));
+el('redeal-pass').addEventListener('click',()=>newDeal(true));
+el('bid-level').addEventListener('change',updateBidForm);
+el('bid-trump').addEventListener('change',()=>{el('confirm-trump').disabled=![...SUITS,'NT'].includes(el('bid-trump').value);});
+el('confirm-trump').addEventListener('click',nameTrump);
+el('submit-bid').addEventListener('click',submitBid);
+el('next-bid').addEventListener('click',nextBid);
+el('begin-play').addEventListener('click',()=>{if(contract&&bidding.finished)startPlay();});
+el('next-card').addEventListener('click',nextCard);
+el('next').addEventListener('click',nextTrick);
+el('view-strategy').addEventListener('click',()=>el('strategy-review').scrollIntoView({behavior:'smooth',block:'start'}));
+el('review-replay').addEventListener('click',()=>{if(contract){startPlay();window.scrollTo({top:0,behavior:'smooth'});}});
+el('review-trick').addEventListener('change',renderReviewTrick);
+el('alternative-card').addEventListener('change',renderAlternative);
+el('reveal').addEventListener('click',()=>{
+ if(phase!=='play'||!state.ended)return;
+ let rv=el('review');if(rv.classList.contains('show')){rv.classList.remove('show');el('reveal').textContent='Reveal original four hands';return;}
+ el('deal-review').innerHTML=ORDER.map(p=>{const cards=sortHandForDisplay(deal[p]);return `<div class="review-row"><span>${LABEL[p]}</span><div class="cards">${cards.map((c,i)=>cardHTML(c,{mini:true,suitStart:i>0&&c[1]!==cards[i-1][1]})).join('')}</div></div>`;}).join('');
+ rv.classList.add('show');el('reveal').textContent='Hide original hands';
+});
+assertDeal(FIXED);deal=cloneHands(FIXED);contract={player:'S',level:4,trump:'S'};startPlay();
+</script>
+</body>
+</html>
